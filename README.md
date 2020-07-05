@@ -1,10 +1,10 @@
-# SeqQEst
+# SeqQEst (Sequence Quality Estimate)
 
 ```
-Do quality estimate for WES/RNA-Seq data
+Estimate sequencing data (WES/RNA-Seq) quality
 
-QC-L1 - check sequnecing quality
-QC-L2 - detecte swap or outgroup samples
+QC-L1 (quality control level 1) - check sequnecing quality
+QC-L2 (quality control level 2) - detecte swap or outgroup samples
 ```
 
 ## Install
