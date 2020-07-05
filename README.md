@@ -1,5 +1,7 @@
 # SeqQEst (Sequence Quality Estimate)
 
+Beta version
+
 ```
 Estimate sequencing data (WES/RNA-Seq) quality
 
