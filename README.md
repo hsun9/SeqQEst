@@ -1,9 +1,10 @@
-# bamQC
+# SeqQEst
+
 ```
-Do quality control for BAMs.
+Do quality estimate for WES/RNA-Seq data
 
 QC-L1 - check sequnecing quality
-QC-L2 - detecte swap or low genecitc backgroud samples
+QC-L2 - detecte swap or outgroup samples
 ```
 
 ## Install
