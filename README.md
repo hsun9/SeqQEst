@@ -20,6 +20,7 @@ fastqc
 7z
 bamreadcount
 optitype
+bwa
 
 python3.7
 ```
