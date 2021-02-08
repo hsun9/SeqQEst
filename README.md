@@ -181,3 +181,15 @@ sh SeqQEst.sh -p qc3-merge -d qc.hlaQC -o qc.hlaQC
 sh SeqQEst.sh -p qc3-summary -f sample.info -m hlaQC.merged.out -o .
 
 ```
+
+
+Contact
+-------------
+Hua Sun, <hua.sun@wustl.edu>
+
+
+Reference
+-------------
+PMID:
+
+
