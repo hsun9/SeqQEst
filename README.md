@@ -43,6 +43,7 @@ Requirements
 
 * Genome *.fa
 	* GENCODE GRCh38 
+	> [Note] The pipeline was tested using GENCODE_GRCh38_v29 reference
 
 * Target interval_list form
 	* https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
