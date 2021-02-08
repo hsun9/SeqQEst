@@ -53,6 +53,7 @@ Requirements
 
 * HLA database
 	* See folder data/
+	* Source: https://github.com/FRED-2/OptiType/tree/master/data
 
 
 
