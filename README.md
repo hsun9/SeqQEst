@@ -36,7 +36,6 @@ Requirements
 	    Pandas
 	    Matplotlib
 	Perl v5.18.2
-	R v3.5.1
 
 
 ### Set database
