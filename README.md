@@ -153,19 +153,6 @@ sh SeqQEst.sh -p qc3-summary -f sample.info -m hlaQC.merged.out -o .
 ```
 
 
-Test examples
--------------
-DNA data (paired end):
-```
-python OptiTypePipeline.py -i ./test/exome/NA11995_SRR766010_1_fished.fastq ./test/exome/NA11995_SRR766010_2_fished.fastq --dna -v -o ./test/exome/
-```
-
-RNA data (paired end):
-```
-python OptiTypePipeline.py -i ./test/rna/CRC_81_N_1_fished.fastq ./test/rna/CRC_81_N_2_fished.fastq --rna -v -o ./test/rna/
-```
-
-
 Contact
 -------------
 Hua Sun, <hua.sun@wustl.edu>
