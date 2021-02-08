@@ -41,17 +41,18 @@ Requirements
 ### Set database
 
 * Genome *.fa
-	* GENCODE GRCh38 
-	> [Note] The pipeline was tested using GENCODE_GRCh38_v29 reference
+	* GENCODE GRCh38
+	
+	[Note] The pipeline was tested using GENCODE_GRCh38_v29 reference
 
-* Target interval_list form
+* Target interval_list form (qc1 - WES coverage)
 	* https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
 
-* SNP loci
+* SNP loci (qc2)
 	* See folder loci/
 	* Note: The public loci will be uploaded after the paper is submitted. 
 
-* HLA database
+* HLA database (qc3)
 	* See folder data/
 	* Source: https://github.com/FRED-2/OptiType/tree/master/data
 
@@ -192,5 +193,4 @@ Hua Sun, <hua.sun@wustl.edu>
 Reference
 -------------
 PMID:
-
 
