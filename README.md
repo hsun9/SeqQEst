@@ -14,7 +14,7 @@ Version: v1.0
 
 Introduction
 -------------
-SeqQEst is a tool to estimate single- and multiple-sample sequence quality, to detect swapped, mislabeled, or contaminated samples, and to confirm genetic lineages through consideration of all available DNA- and RNA-seq data. 
+SeqQEst is a tool to estimate single- and multiple-sample sequence quality, to detect swapped, mislabeled, or contaminated samples, and to confirm genetic lineages through consideration of bulk DNA- and RNA-seq data. 
 
 
 
