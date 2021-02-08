@@ -69,7 +69,37 @@ Input
 	* WES
 	* RNA-Seq
 	
-* Table of sample info
+* Table of bam/sample info
+	* bam.catalog (Form)
+		> The table uses for running cohort
+
+		```
+		ID   DataType   Bam
+		TWDE-M1511917 WES /path/PDX/TWDE-M1511917.bam
+      	```
+      	```
+      	[Note]
+      	DataType: WGS/WES/RNA-Seq
+		```
+		
+	* sample.info (Form)
+		> The table uses for summary of qc2 & qc3
+
+		```
+		CaseID	ID	NewID	DataType	Group
+       WU12	TWDE242	WU12.WES.N	WES	Human_Normal
+       WU59	TWDE4639	WU59.WES.P2	WES	PDX
+       ```
+       
+       ```
+       [Note]
+       CaseID: Case ID
+       ID: Data ID
+       DataType: WGS/WES/RNA-Seq
+       Group: Human_Normal/Human_Tumor/PDX
+       NewID: If there is no short name then set as '.'
+			
+		```
 
 
 
@@ -151,14 +181,3 @@ sh SeqQEst.sh -p qc3-merge -d qc.hlaQC -o qc.hlaQC
 sh SeqQEst.sh -p qc3-summary -f sample.info -m hlaQC.merged.out -o .
 
 ```
-
-
-Contact
--------------
-Hua Sun, <hua.sun@wustl.edu>
-
-
-Reference
--------------
-PMID:
-
