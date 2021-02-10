@@ -118,7 +118,7 @@ e.g.
 open "SeqQEst.sh" and set 
 config="/fullpath/config.ini"
 
-sh SeqQEst.sh -p <pipelineName> -n <name> -o <outdir>
+sh SeqQEst.sh -p <pipelineName> -n <name> -b <bam> -o <outdir>
 
 ```
 
