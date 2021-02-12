@@ -15,7 +15,6 @@
     -i|--info <file>  sample info file
     --hla <file>      merged hla file
     -o [str]          outdir
-  
 
 """
 
@@ -102,24 +101,29 @@ def Make_SummaryReport_for_HLA(df_hla, df_info, outfile):
 
     # 3. add sample info
     df_info = df_info.merge(df_new, on='ID', how='outer')
+    # notice info
     Summary_CheckInfo(df_info)
+
     df_info = df_info[df_info['CaseID'].notna()]
     # NaN to unknwon
     df_info['HLA'] = df_info['HLA'].fillna(value="Unknown")
+
+
+    # 4. summary
+    df_info['HLA'] = df_info['HLA'].astype(str)
+    report_hla = df_info.groupby(['CaseID', 'HLA']).size().reset_index(name="MatchedHLA_dataSize")
+    totalSampleSize = df_info[['CaseID', 'ID']].groupby('CaseID').size().reset_index(name="TotalDataSize")
+    report_hla = report_hla.merge(totalSampleSize, on='CaseID', how='left')
+    report_hla['AlienDataName'] = '.'
+    report_hla.to_csv(f'{outfile}.log', sep='\t', index=False)
+    # CaseID  HLA  MatchedHLA_dataSize  TotalDataSize AlienDataName
     
     # hla dict
     dict_hla_sample = MakeDictionary(df_info[['HLA', 'ID']])
     # case dict
     dict_case_sample = MakeDictionary(df_info[['CaseID', 'ID']])
 
-    # 4. summary
-    df_info['HLA'] = df_info['HLA'].astype(str)
-    report_hla = df_info.groupby(['CaseID', 'HLA']).size().reset_index(name="MatchedHLASample")
-    totalSampleSize = df_info[['CaseID', 'ID']].groupby('CaseID').size().reset_index(name="TotalSample")
-    report_hla = report_hla.merge(totalSampleSize, on='CaseID', how='left')
-    report_hla['AlienSample'] = '.'
-    
-    SeekAlienSample(report_hla, dict_hla_sample, dict_case_sample, outfile)
+    SeekAlienSample(df_info, report_hla, dict_hla_sample, dict_case_sample, outfile)
 
    
 
@@ -127,13 +131,14 @@ def Make_SummaryReport_for_HLA(df_hla, df_info, outfile):
 # Make_SummaryReport_for_HLA - sub part-1
 def Summary_CheckInfo(info):
     total_case = len(info['CaseID'].unique())
+    with_hla = info.dropna(subset=['HLA']).shape[0]
     print(f'[INFO] Total CaseID: {total_case}')
+    print(f'[INFO] Data with HLA info: {with_hla}')  
     
     null_case = info['CaseID'].isnull().sum()
     null_hla = info['HLA'].isnull().sum()
-
     print(f'[INFO] Numbers of Empty CaseID: {null_case}')  
-    print(f'[INFO] Numbers of Empty HLA: {null_hla}')
+    print(f'[INFO] Data without HLA: {null_hla}')
 
 
 
@@ -159,43 +164,52 @@ def MakeDictionary(df):
 
 
 # Make_SummaryReport_for_HLA - sub part-3
-def SeekAlienSample(report, dict_hla, dict_case, outfile):
-    # sort
-    report.sort_values(by=['CaseID', 'MatchedHLASample'], ascending=False, inplace=True)
-    report['Not_MatchedHLASample'] = 0
+def SeekAlienSample(df_info, report, dict_hla, dict_case, outfile):
+
+    report['ID_mix'] = report['HLA'].apply(lambda x: dict_hla.get(x))
+    # CaseID  HLA  MatchedHLA_dataSize  TotalDataSize AlienDataName IDs
 
     # summary
-    summary_report = pd.DataFrame(columns=['CaseID', 'TotalSample', 'HLA', 'MatchedHLASample',  'Not_MatchedHLASample', 'AlienSample'])
+    summary_report = pd.DataFrame(columns=['CaseID', 'TotalDataSize', 'HLA', 'MathedHLA_data', 'NotMathedHLA_data', 'No_HLA', 'AlienDataName'])
 
-    for key in report.index:
-        caseID = ''.join(report.loc[report.index==key, 'CaseID'].values)
+    for case_name in report.CaseID.unique():
         
-        if caseID in list(summary_report.CaseID.values):
+        df_per_case = report.loc[report.CaseID==case_name]
+        
+        total_data_size = df_per_case.TotalDataSize.values[0]
+        no_hla = df_per_case.loc[df_per_case.HLA=='Unknown'].shape[0]
 
-            #if report['HLA'][report.index==key].values == 'nan':
-            #    continue
+        if df_per_case.shape[0]>1:
+            max_val = max(df_per_case.MatchedHLA_dataSize.values.tolist())
 
-            hla_from_org_report = ''.join(report['HLA'][report.index==key].values)
-            sample_id = dict_hla.get(hla_from_org_report)
-            
-            # find target sample
-            if len(sample_id) > 1:
-                # double check from target case
-                targetSampleList = dict_case.get(caseID)
-                sample_id = list(set(targetSampleList) & set(sample_id))
+            if max_val == 1:
+                hla = 'Mixed'
+                matched_hla_data = 1
+                not_matched_hla_data = 'Ambiguity'
 
-            sample_id = ','.join(sample_id)
-
-            # add AlienSample
-            if summary_report.loc[summary_report.CaseID==caseID, 'Not_MatchedHLASample'].values > 0:
-                summary_report.loc[summary_report.CaseID==caseID, 'Not_MatchedHLASample'] = summary_report.loc[summary_report.CaseID==caseID, 'Not_MatchedHLASample'].values + int(report.loc[report.index==key, 'MatchedHLASample'].values)
-                summary_report.loc[summary_report.CaseID==caseID, 'AlienSample'] = summary_report.loc[summary_report.CaseID==caseID, 'AlienSample'] + ',' + sample_id
+                alien_name = 'Ambiguity'
             else:
-                summary_report.loc[summary_report.CaseID==caseID, 'Not_MatchedHLASample'] = int(report.loc[report.index==key, 'MatchedHLASample'].values)
-                summary_report.loc[summary_report.CaseID==caseID, 'AlienSample'] = sample_id
+                hla = df_per_case.loc[df_per_case.MatchedHLA_dataSize==max_val, 'HLA'].values[0]
+                matched_hla_data = max_val
+                not_matched_hla_data = total_data_size - matched_hla_data - no_hla
+
+                mixedID = df_per_case.loc[df_per_case.MatchedHLA_dataSize!=max_val, 'ID_mix'].tolist()
+                flat_list = [item for sublist in mixedID for item in sublist]
+                sampleList = df_info.loc[df_info['CaseID']==case_name, 'ID'].values.tolist()
+                
+                alien_name = list(set(flat_list) & set(sampleList))
         else:
-            rec = report.loc[report.index==key, ['CaseID', 'TotalSample', 'HLA', 'MatchedHLASample', 'Not_MatchedHLASample', 'AlienSample']]
-            summary_report = summary_report.append(rec, ignore_index=True)
+            hla = df_per_case.HLA.values[0]
+            matched_hla_data = df_per_case.MatchedHLA_dataSize.values[0]
+            not_matched_hla_data = 0
+
+            alien_name = df_per_case.AlienDataName.values[0]
+            
+
+        
+        rec = {'CaseID':case_name, 'TotalDataSize':total_data_size,
+                'HLA':hla, 'MathedHLA_data':matched_hla_data, 'NotMathedHLA_data':not_matched_hla_data, 'No_HLA':no_hla, 'AlienDataName':alien_name}
+        summary_report = summary_report.append(rec, ignore_index=True)
 
 
     # summary output

@@ -91,6 +91,14 @@ run_optiType () {
 
 ##------------- OptiTypePipeline (only using it re-run optitype)
 if [[ $pipeline == "optiType" ]]; then
+    
+    n=`ls $OUT/*/*.tsv | wc -l`
+    
+    if [[ $n > 0 ]];then
+        echo "[INFO] The $OUT/$NAME already exist HLA genotype ..." >&2
+        exit 0
+    fi
+    
     run_optiType
     exit 0
 fi

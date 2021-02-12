@@ -1,68 +1,107 @@
+'''
+    Hua Sun
+
+    2019-11-04
+
+    Plot for qc.SeqQC summary data
+
+    DataType: WGS/WES/RNA-Seq
+
+    python3 seqQC.summary.plot.py -d qc.seqQC.tsv --info sample.info -o outdir 
+
+
+'''
+
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-#%matplotlib inline
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d','--data', help='input data frame')
-parser.add_argument('-t','--dataType', help='data type')
+parser.add_argument('--info', help='sample info')
 parser.add_argument('-o','--outdir', default='.', help='out dir')
 
 args = parser.parse_args()
 
-#f_in = '../data_info/washU.rcc.used.xlsx'
-
 
 
 '''
-	Main
+    Main
 '''
 def main():
-	df = pd.read_csv(args.data, sep='\t')
+    if not os.path.isdir(args.outdir):
+        os.makedirs(args.outdir)
 
-	# WES
-	if args.dataType == 'WES':
-		# coverage
-		outfile = f'{args.outdir}/qc.wxs.cov.pdf'
-		scatterPlot('WES', df, 'Sample', 'MeanTargetCoverage(MQ20)', outfile)
+    df = pd.read_csv(args.data, sep='\t')
+    info = pd.read_csv(args.info, sep='\t')
 
-	# RNA-Seq
-	if args.dataType == 'RNA-Seq':
-		# mapping reads depth
-		outfile = f'{args.outdir}/qc.rna-seq.depth.pdf'
-		scatterPlot('RNA-Seq', df, 'Sample', 'MappedReads(M)', outfile)
+    df_merge = pd.merge(df, info, left_on='Sample', right_on='ID', how='left')
 
+
+    for dataType in df_merge['DataType'].unique():
+        
+        if dataType == 'WGS':
+            df_tar = df_merge.loc[df_merge['DataType']=='WGS', ['ID', 'MeanDepth_for_WGS']]
+        
+        if dataType == 'WES':
+            df_tar = df_merge.loc[df_merge['DataType']=='WES', ['ID', 'MeanTargetCoverage(MQ20)']]
+                    
+        if dataType == 'RNA-Seq':
+            df_tar = df_merge.loc[df_merge['DataType']=='WGS', ['ID', 'MappedReads(M)']]
+        
+        if df_tar.shape[0] > 0:
+            PlotDepth(df_tar, dataType, args.outdir)
 
 
 
 '''
-	Set function
+    Set function
 '''
-def scatterPlot(title, df, x, y, outfile):
+
+def PlotDepth(df, dataType, outdir):
+    
+    df = df.sort_values(by=df.columns.values[1], ascending=False)
+
+    title = ''
+    ylabel = ''
+
+    if dataType == 'WGS':
+        title = 'WGS data'
+        ylabel = 'Mean depth'
+
+    if dataType == 'WES':
+        title = 'WES data'
+        ylabel = 'Mean target coverage (MQ20)'
+
+    if dataType == 'RNA-Seq':
+        title = 'RNA-Seq data'
+        ylabel = 'Mean reads (M)'
+
     sampleSize = df.shape[0]
 
+    plt.plot(df.iloc[:,0], df.iloc[:,1], 'o', markersize=4)
     
-    df.sort_values(by=[y]).plot.scatter(x=x, y=y)
-
     plt.title(title)
-    plt.xlabel('Sample size n=' + str(sampleSize))
+    plt.xlabel(f'Sample size n={sampleSize}')
+    plt.ylabel(ylabel)
     
-    plt.xticks('')    # hide x-axis
-    plt.ylim(0, )  # Limits for the Y axis
+    plt.xticks('')
+    plt.ylim(0, )
     
-    plt.axhline(y=50, color='g', linestyle='-') # add line
-    plt.axhline(y=20, color='r', linestyle='-') # add line
+    plt.axhline(y=50, color='g', linestyle='-')
+    plt.axhline(y=20, color='r', linestyle='-')
     
-    
+    outfile = f'{outdir}/qc.seqQC.{dataType}.pdf'
+
     plt.savefig(outfile)
 
 
 
-
 if __name__ == '__main__':
-	main()
+    main()
 
 
 

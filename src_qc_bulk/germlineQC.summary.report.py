@@ -11,6 +11,7 @@
 
 """
 
+
 import argparse
 import os
 import io
@@ -113,7 +114,7 @@ def CheckSampleMatching_forCase(info, data, dict_info, outdir):
     
     caseList = list(info['CaseID'].unique())
     
-    summary_rec = pd.DataFrame(columns=['ID', 'Matched_DNA', 'Matched_RNA', 'Total_Matched_N', 'Matched_Rate', 'QC', 'LowCor_with'])
+    summary_rec = pd.DataFrame(columns=['ID', 'TotalData_in_Case', 'Matched_DNA', 'Matched_RNA', 'Total_Matched_N', 'MatchedRate_in_Case', 'QC', 'LowCor_with'])
 
     for caseID in caseList:
         sampleList = list(info.loc[info['CaseID']==caseID, 'ID'])
@@ -131,23 +132,24 @@ def CheckSampleMatching_forCase(info, data, dict_info, outdir):
 
 ## ExtractDataFromMatrix
 def MakeSummaryReport_forCaseLevel(df, dict_info, sampleList, summary_rec):
+    
     # extract target data
     df_tar = df[sampleList]
     df_tar = df_tar.loc[sampleList]
 
     # summary per sample from same case
-    n = df_tar.shape[0]  # sample size
+    totalSampleSize = df_tar.shape[0]  # sample size
     colnameList = list(df_tar.columns.values)
     rownameList = list(df_tar.index.values)
     
-    for i in range(0,n):
+    for i in range(0, totalSampleSize):
         targetID = rownameList[i]
         target_dataType = dict_info.get(targetID, 0)
         
         low_cor_id = ''
         dna_n = 0
         rna_n = 0
-        for j in range(0,n):
+        for j in range(0, totalSampleSize):
             queryID = colnameList[j]
             if targetID == queryID:
                 continue
@@ -170,18 +172,18 @@ def MakeSummaryReport_forCaseLevel(df, dict_info, sampleList, summary_rec):
         # add record per sample
         total_matched = dna_n + rna_n
         matched_rate = 0
-        if n > 1 :
-            matched_rate = float(format(total_matched/(n-1)*100, '.2f'))   # n-1 for removing counting itself
+        if totalSampleSize > 1 :
+            matched_rate = float(format((total_matched+1)/totalSampleSize*100, '.2f'))   # counting itself
         
         qc = 'PASS'
         if matched_rate < 50:
             qc = 'FAIL'
         if matched_rate == 50:
             qc = 'AMBIGUITY'
-        if n == 1:
+        if totalSampleSize == 1:
             qc = 'SINGLE'
         
-        rec = {'ID':targetID, 'Matched_DNA':dna_n, 'Matched_RNA':rna_n, 'Total_Matched_N':int(total_matched), 'Matched_Rate':matched_rate, 'QC':qc, 'LowCor_with':low_cor_id}
+        rec = {'ID':targetID, 'TotalData_in_Case':totalSampleSize, 'Matched_DNA':dna_n, 'Matched_RNA':rna_n, 'Total_Matched_N':int(total_matched), 'MatchedRate_in_Case':matched_rate, 'QC':qc, 'LowCor_with':low_cor_id}
         summary_rec = summary_rec.append(rec, ignore_index=True)
 
 
