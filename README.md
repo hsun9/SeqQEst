@@ -178,7 +178,7 @@ sh SeqQEst.sh -p stat -n sampleName -b sample.bam -o qc.seqQC
 sh SeqQEst.sh -p qc1-summary -d qc.seqQC
 
 # plot for QC-L1
-sh SeqQEst.sh -p qc1-plot -m matrix.tsv -n title -g groupname(WXS or RNA-Seq)
+sh SeqQEst.sh -p qc1-plot -m matrix.tsv -f sample.info -o summary_seqQC
 
 ```
 
