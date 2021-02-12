@@ -21,7 +21,7 @@ SeqQEst is a tool to estimate single- and multiple-sample sequence quality, to d
 Requirements
 -------------
 
-### Install
+### Install (conda)
 
     JRE v1.8
     Picard v2.17.11
@@ -33,9 +33,13 @@ Requirements
     OptiType v1.3.2
     
     Python 3.x (>=3.7)
-	    Pandas
-	    Matplotlib
+	    Pandas v1.2.1
+	    Matplotlib v3.3.4
+	    Seabornd v0.11.1
 	Perl v5.18.2
+
+
+	[Note] Set up is able to use Miniconda
 
 
 ### Set database
@@ -59,8 +63,9 @@ Requirements
 
 
 ### Set config
-	
-Please refer to config/config.demo.ini
+
+* Set "set_optiType.ini" (set razers3 location)
+* Set "config.ini", please refer to config/config.demo.ini
 
 
 
@@ -104,15 +109,46 @@ Input
 		```
 
 
+Output
+-------------
+
+* SeqQC
+
+	```
+	qc.SeqQC/
+		qc1.seq.summary.merged.out        # summary report
+	```
+
+* GermlineQC
+
+	```
+	qc.germlineQC/
+	summary_germlineQC/
+		report.summary_germlineQC.out     # summary report
+		all_of_corAllSamplesPair.tsv
+		export_corr_matrix.tsv
+		report.germlineQC.potential.swap_data.out
+		...
+	```
+
+* HLA-QC
+
+	```
+	qc.hlaQC/
+	summary_hlaQC/
+		report.summary_hlaQC.out          # summary report
+		report.hla_with_info.out
+	```
+
 
 Usage
 -------------
 
 ```
-sh SeqQEst.sh -c <config.ini> -p <pipelineName> -n <name> -o <outdir>
+sh SeqQEst.sh -c <config.ini> -p <pipelineName> -n <name> -b <bam> -o <outdir>
 
 
-Tip: To conveniently use commend line, the config.ini location sets into the SeqQEst.sh code.
+Tip: If you don’t want to set “contig.ini” repeatedly, then you can set it inside the "SeqQEst.sh".
 
 e.g.
 open "SeqQEst.sh" and set 
@@ -152,42 +188,100 @@ sh SeqQEst.sh -p qc1-plot -m matrix.tsv -n title -g groupname(WXS or RNA-Seq)
 # call bamreadcount
 sh SeqQEst.sh -p qc2-brc -n sample -b sample.bam -o qc.germlineQC
 
-# merge vaf
-# generate  qc2.merged.vaf.table
+# qc2 merge
 sh SeqQEst.sh -p qc2-merge -d qc.germlineQC/brc -o qc.germlineQC
 
-# qc-l2 summary (out plot & text)
-# //sampleInfo
-# CaseID  ID  NewID   DataType    Group
-# C0012 S242-242-03 .   WES Human_Normal
-# C0059 S4639   .  WES PDX
+# qc2 summary
+sh SeqQEst.sh -p qc2-summary -f sample.info -m qc2.snp.merged_vaf.table -o summary_germlineQC
 
-
-sh SeqQEst.sh -p qc2-summary -m matrix.tsv -f sample.info -o qc.germlineQC
-
-# plot for QC-L2
-sh SeqQEst.sh -p qc2-plot -m matrix.tsv -o qc.germlineQC
+# plot for qc2
+sh SeqQEst.sh -p qc2-plot -m matrix.tsv -o summary_germlineQC
 
 ```
 
 #### HLA-QC (qc3)
 
 ```
-# qc-l3 call hla (-t dna/rna)
+# qc3 call hla (-t dna/rna)
 sh SeqQEst.sh -p qc3-hla -n samplename -t dna -b sample.bam -o qc.hlaQC
 
-# qc-l3 merge
+# qc3 merge
 sh SeqQEst.sh -p qc3-merge -d qc.hlaQC -o qc.hlaQC
 
-# qc-l3 summary
-sh SeqQEst.sh -p qc3-summary -f sample.info -m hlaQC.merged.out -o .
+# qc3 summary
+sh SeqQEst.sh -p qc3-summary -f sample.info -m qc3.hla.merged.out -o summary_hlaQC
 
 ```
+
+
+#### Tutorial: Run multiple samples in cluster
+
+```
+MGI-Server (LSF)
+[Note] Three of QCs are independent. Hence you can run all programs at the same time.
+	
+1. Data Processing
+	
+	* SeqQC
+	> Input  : bam.catalog.table
+	> Output : qc.seqQC
+	sh worklogs/run.seqQC.fromTable.sh -T ./demo.bam.catalog.table
+	
+	* GermlineQC
+	> Input  : bam.catalog.table
+	> Output : qc.germlineQC/brc
+	sh worklogs/run.germlineQC.callSNPs.fromTable.sh -T ./demo.bam.catalog.table
+	
+	* HLA-QC
+	> Input  : bam.catalog.table
+	> Output : qc.hlaQC
+	sh worklogs/run.hlaQC.callHLA.fromTable.sh -T ./demo.bam.catalog.table 
+	
+	# plot
+	sh SeqQEst.sh -p qc1-plot -m qc.seqQC/qc1.seq.summary.merged.out -f ./demo.sample.info -o summary_seqQC
+
+
+2. Summary Report (Table)
+	
+	* SeqQC
+	> Input  : qc.seqQC
+	> Output : qc.seqQC/qc1.seq.summary.merged.out
+	sh SeqQEst.sh -p qc1-summary -d ./qc.seqQC
+	
+	
+	* GermlineQC
+	> Input  : qc.germlineQC/brc
+	> Output : qc.germlineQC/qc2.snp.merged_vaf.table
+	sh SeqQEst.sh -p qc2-merge -d qc.germlineQC/brc -o qc.germlineQC
+	
+	> Input  : 1. qc.germlineQC/qc2.snp.merged_vaf.table
+	           2. sample.info 
+	> Output : summary_germlineQC
+	           summary_germlineQC/report.summary_germlineQC.out
+	sh SeqQEst.sh -p qc2-summary -m qc.germlineQC/qc2.snp.merged_vaf.table -f sample.info -o summary_germlineQC
+	
+	# plot
+	sh SeqQEst.sh -p qc2-plot -m summary_germlineQC/export_corr_matrix.tsv -o summary_germlineQC
+	
+	
+	* HLA-QC
+	> Input  : qc.hlaQC
+	> Output : qc.hlaQC/qc3.hla.merged.out
+	sh SeqQEst.sh -p qc3-merge -d qc.hlaQC -o qc.hlaQC
+	
+	> Input  : 1. qc.hlaQC/qc3.hla.merged.out
+	           2. sample.info
+	> Output : summary_hlaQC
+	           summary_hlaQC/report.summary_hlaQC.out
+	sh SeqQEst.sh -p qc3-summary -f sample.info -m qc.hlaQC/qc3.hla.merged.out -o summary_hlaQC
+
+
+```
+
+
 
 
 Contact
 -------------
 Hua Sun, <hua.sun@wustl.edu>
-
-
 
