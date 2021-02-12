@@ -18,7 +18,7 @@
 
 
 outdir=`pwd`
-config="/gscuser/hua.sun/scripts/SeqQEst/config/config.gencode.ini"
+config="/gscmnt/gc2737/ding/hsun/github/SeqQEst/config/config.gencode.ini"
 
 
 type='dna' # dna/rna
