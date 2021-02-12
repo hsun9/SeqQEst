@@ -131,8 +131,7 @@ fi
 ##------------ Plot (QC-L1: step-3)
 # manually merge all results
 if [[ $pipeline == "qc1-plot" ]]; then
-  #sh $scriptDir/qc.plot.summary.sh -M ${matrix} -F ${sampleInfo} -O {outdir}
-    Rscript $scriptDir/seqQC.summary.plot.R --title ${name} --input ${matrix} --group ${group}
+    ${PYTHON3} $scriptDir/seqQC.summary.plot.py -d ${matrix} --info ${sampleInfo} -o ${outdir}
 fi
 
 
@@ -161,11 +160,11 @@ if [[ $pipeline == "qc2-summary" ]]; then
   
   # output - all cor.
     echo "[INFO] qc2-summary - Calculate correlation ..." >&2
-    python3 $scriptDir/germlineQC.call_correlation.py -i ${matrix} -o ${outdir} --show_pair_cor
+    ${PYTHON3} $scriptDir/germlineQC.call_correlation.py -i ${matrix} -o ${outdir} --show_pair_cor
 
     # Judge PASS/FAIL/swap
     echo "[INFO] qc2-summary - Calculate Pass/Fail/Swap ..." >&2
-    python3 $scriptDir/germlineQC.summary.report.py -i ${outdir}/export_corr_matrix.tsv -a ${sampleInfo} -o ${outdir}
+    ${PYTHON3} $scriptDir/germlineQC.summary.report.py -i ${outdir}/export_corr_matrix.tsv -a ${sampleInfo} -o ${outdir}
 fi
 
 
@@ -173,7 +172,7 @@ fi
 if [[ $pipeline == "qc2-plot" ]]; then
   # plot-heatmap
   # need to add sort by caes function
-    python3 $scriptDir/germlineQC.summary.plot.heatmap.py -i ${matrix} -o ${outdir} --cluster
+    ${PYTHON3} $scriptDir/germlineQC.summary.plot.heatmap.py -i ${matrix} -o ${outdir} --cluster
 fi
 
 
@@ -200,7 +199,7 @@ fi
 ##------------ Merge HLA results (QC-L3: step-2)
 if [[ $pipeline == "qc3-merge" ]]; then
 
-    ls ${outdir}/*/*/*_result.tsv | while read file; do sample=`echo $file | perl -ne '@arr=split("\/");print $arr[-3]'`; sed '1d' $file | cut -f 2- | perl -pe 's/^/'$sample'\t/'; done | perl -pe 's/^/Sample\tA1\tA2\tB1\tB2\tC1\tC2\tReads\tObjective\n/ if $.==1' > ${outdir}/qc3.hla.merged.out
+    ls ${outdir}/*/*/*_result.tsv | while read file; do sample=`echo $file | perl -ne '@arr=split("\/");print $arr[-3]'`; sed '1d' $file | cut -f 2- | perl -pe 's/^/'$sample'\t/'; done | sort -u | perl -pe 's/^/Sample\tA1\tA2\tB1\tB2\tC1\tC2\tReads\tObjective\n/ if $.==1' > ${outdir}/qc3.hla.merged.out
 
 fi
 
@@ -209,7 +208,7 @@ fi
 if [[ $pipeline == "qc3-summary" ]]; then
 
     echo "[INFO] HLA-QC summary report ..." >&2
-    python3 $scriptDir/hlaQC.summary.report.py -i ${sampleInfo} --hla ${matrix} -o ${outdir}
+    ${PYTHON3} $scriptDir/hlaQC.summary.report.py -i ${sampleInfo} --hla ${matrix} -o ${outdir}
 
 fi
 
