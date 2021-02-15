@@ -23,8 +23,8 @@ Requirements
 
 ### Install (conda)
 	
-	Install below tools by 'sh setup/setup.sh'
-	'sh setup/setup.sh' will output `config_seqQEst.ini`, which will list all of tool locations
+	Install below tools by 'sh setup/setup_tools.sh'
+	'sh setup/setup_tools.sh' will output `config_seqQEst.ini`, which will list all of tool locations
 	
     	JRE v1.8
     	Picard >=v2.17.11
@@ -286,5 +286,4 @@ MGI-Server (LSF)
 Contact
 -------------
 Hua Sun, <hua.sun@wustl.edu>
-
 
