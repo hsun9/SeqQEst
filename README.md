@@ -23,9 +23,10 @@ Requirements
 
 ### Install (conda)
 	
-	Install below tools by 'sh setup/setup_tools.sh'
-	'sh setup/setup_tools.sh' will output `config_seqQEst.ini`, which will list all of tool locations
-	
+Install below tools by `sh setup/setup_tools.sh` 
+`sh setup/setup_tools.sh` will output `config_seqQEst.ini`, which will list all of tool locations.
+
+```	
     	JRE v1.8
     	Picard >=v2.17.11
     	Samtools >=v1.5
@@ -40,7 +41,7 @@ Requirements
 	    	Matplotlib v3.3.4
 	    	Seabornd v0.11.1
 		Perl >=v5.18.2
-
+```
 
 
 ### Set database
