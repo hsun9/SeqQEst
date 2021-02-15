@@ -23,8 +23,10 @@ Requirements
 
 ### Install (conda)
 	
-Install below tools by `sh setup/setup_tools.sh` 
-`sh setup/setup_tools.sh` will output `config_seqQEst.ini`, which will list all of tool locations.
+Install below tools by "sh setup/setup_tools.sh"
+
+The "setup_tools.sh" will install tools and output `config_seqQEst.ini`, which will list all of tool locations.
+
 
 ```	
     	JRE v1.8
