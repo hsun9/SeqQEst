@@ -22,24 +22,25 @@ Requirements
 -------------
 
 ### Install (conda)
-
-    JRE v1.8
-    Picard v2.17.11
-    Samtools v1.5
-    FastQC v0.11.9
-    7z v15.09
-    Bam-readcount v0.7.4
-    BWA v0.7.17
-    OptiType v1.3.2
+	
+	Install below tools by 'sh setup/setup.sh'
+	'sh setup/setup.sh' will output `config_seqQEst.ini`, which will list all of tool locations
+	
+    	JRE v1.8
+    	Picard >=v2.17.11
+    	Samtools >=v1.5
+    	FastQC >=v0.11.9
+    	7z >=v15.09
+    	Bam-readcount v0.7.4
+    	BWA v0.7.17
+    	OptiType v1.3.2
     
-    Python 3.x (>=3.7)
-	    Pandas v1.2.1
-	    Matplotlib v3.3.4
-	    Seabornd v0.11.1
-	Perl v5.18.2
+    	Python 3.x (>=3.7)
+	    	Pandas v1.2.1
+	    	Matplotlib v3.3.4
+	    	Seabornd v0.11.1
+		Perl >=v5.18.2
 
-
-	[Note] Set up is able to use Miniconda
 
 
 ### Set database
@@ -66,6 +67,7 @@ Requirements
 
 * Set "set_optiType.ini" (set razers3 location)
 * Set "config.ini", please refer to config/config.demo.ini
+* Please refer to 'setup/setup.sh' output `config_seqQEst.ini` to set 
 
 
 
@@ -284,4 +286,5 @@ MGI-Server (LSF)
 Contact
 -------------
 Hua Sun, <hua.sun@wustl.edu>
+
 
