@@ -6,7 +6,7 @@ Quality control for next-generation sequencing data
 Author: Hua Sun  
 Version: v1.01
 
-* Updated
+* Updated (2021-02-15)
 	* v1.01 -- Updated SeqQC summary
 
 * Previous version
