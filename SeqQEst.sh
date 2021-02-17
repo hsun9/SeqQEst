@@ -3,6 +3,7 @@
 # Author: Hua Sun
 # Email: hua.sun@wustl.edu or hua.sun229@gmail.com
 
+# 2021-02-15   v1.01  update SeqQC summary report
 # 2020-11-10   v1.0  renamed all of scripts; add HLA-QC local version to SeqQEst 
 # 2020-07-29   beta v0.3
 
@@ -18,7 +19,7 @@
 
 
 outdir=`pwd`
-config="/gscmnt/gc2737/ding/hsun/github/SeqQEst/config/config.gencode.ini"
+config="/gscuser/hua.sun/scripts/SeqQEst/config/config.gencode.ini"
 
 
 type='dna' # dna/rna
@@ -111,17 +112,17 @@ fi
 
 ##------------ Summary (QC-L1: step-2)
 # manually merge all results
-if [[ $pipeline == "qc1-summary" ]]; then
+if [[ $pipeline == "qc1-merge" ]]; then
     if [ -d $dir ]; then
   
         ls $dir | sed 's/\///' | perl -ne 'print unless /^\./' | while read sample
         do
-            echo [INFO] Summary QC-L1 - $sample ......
-	        perl $scriptDir/seqQC.summary.report.pl -n ${sample} -f ${dir}/${sample}/flagstat.txt -s ${dir}/${sample}/bamStats.txt -m ${dir}/${sample}/hsMetrics.txt -d ${dir}/${sample}/meanDepth.txt --qc ${dir}/${sample}/*_fastqc/summary.txt > ${dir}/${sample}/qc1.summary.out
+            echo [INFO] Merge report QC-L1 - $sample ......
+	        perl $scriptDir/seqQC.merge.report.pl -n ${sample} -f ${dir}/${sample}/flagstat.txt -s ${dir}/${sample}/bamStats.txt -m ${dir}/${sample}/hsMetrics.txt -d ${dir}/${sample}/meanDepth.txt --qc ${dir}/${sample}/*_fastqc/summary.txt > ${dir}/${sample}/qc1.mergedRport.out
         done
 
-        echo [INFO] Merge summary QC ......
-        cat $dir/*/qc1.summary.out > $dir/merged.summary.qc.tmp; head -n 1 $dir/merged.summary.qc.tmp > $dir/head.tmp; grep -v 'Total_reads' $dir/merged.summary.qc.tmp > $dir/merged.summary.qc.2.tmp; cat $dir/head.tmp $dir/merged.summary.qc.2.tmp > $dir/qc1.seq.summary.merged.out
+        echo [INFO] Merge all reports of QC ......
+        cat $dir/*/qc1.mergedRport.out > $dir/merged.summary.qc.tmp; head -n 1 $dir/merged.summary.qc.tmp > $dir/head.tmp; grep -v 'Total_reads' $dir/merged.summary.qc.tmp > $dir/merged.summary.qc.2.tmp; cat $dir/head.tmp $dir/merged.summary.qc.2.tmp > $dir/qc1.seq.report.merged.out
         
         rm -f $dir/*.tmp
     fi
@@ -130,8 +131,8 @@ fi
 
 ##------------ Plot (QC-L1: step-3)
 # manually merge all results
-if [[ $pipeline == "qc1-plot" ]]; then
-    ${PYTHON3} $scriptDir/seqQC.summary.plot.py -d ${matrix} --info ${sampleInfo} -o ${outdir}
+if [[ $pipeline == "qc1-summary" ]]; then
+    ${PYTHON3} $scriptDir/seqQC.summary.report.py -d ${matrix} --info ${sampleInfo} -o ${outdir}
 fi
 
 
