@@ -57,6 +57,7 @@ The "setup_tools.sh" will install tools and output `config_seqQEst.ini`, which w
 
 * Target interval_list form (qc1 - WES coverage)
 	* https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
+	* Refer to interval_list/proteinCoding.cds.merged.gencode_hg38_v29.interval_list
 
 * SNP loci (qc2)
 	* See folder loci/
