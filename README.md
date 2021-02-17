@@ -4,10 +4,13 @@ SeqQEst
 Quality control for next-generation sequencing data
 
 Author: Hua Sun  
-Version: v1.0  
+Version: v1.01
 
+* Updated
+	* v1.01 -- Updated SeqQC summary
 
 * Previous version
+	* Version v1.0: https://github.com/ding-lab/SeqQEst/tree/v1.0
 	* Beta version: https://github.com/ding-lab/SeqQEst/tree/beta-version
 
 
@@ -26,7 +29,6 @@ Requirements
 Install below tools by "sh setup/setup_tools.sh"
 
 The "setup_tools.sh" will install tools and output `config_seqQEst.ini`, which will list all of tool locations.
-
 
 ```	
     	JRE v1.8
@@ -179,11 +181,11 @@ sh SeqQEst.sh -p meanDepth -n sampleName -b sample.bam -o qc.seqQC
 # flagstat & stat
 sh SeqQEst.sh -p stat -n sampleName -b sample.bam -o qc.seqQC
 
-# summary QC
-sh SeqQEst.sh -p qc1-summary -d qc.seqQC
+# merge seqQC results
+sh SeqQEst.sh -p qc1-merge -d qc.seqQC
 
-# plot for QC-L1
-sh SeqQEst.sh -p qc1-plot -m matrix.tsv -f sample.info -o summary_seqQC
+# qc1 summary and plot
+sh SeqQEst.sh -p qc1-summary -m matrix.tsv -f sample.info -o summary_seqQC
 
 ```
 
@@ -240,10 +242,7 @@ MGI-Server (LSF)
 	* HLA-QC
 	> Input  : bam.catalog.table
 	> Output : qc.hlaQC
-	sh worklogs/run.hlaQC.callHLA.fromTable.sh -T ./demo.bam.catalog.table 
-	
-	# plot
-	sh SeqQEst.sh -p qc1-plot -m qc.seqQC/qc1.seq.summary.merged.out -f ./demo.sample.info -o summary_seqQC
+	sh worklogs/run.hlaQC.callHLA.fromTable.sh -T ./demo.bam.catalog.table
 
 
 2. Summary Report (Table)
@@ -251,7 +250,12 @@ MGI-Server (LSF)
 	* SeqQC
 	> Input  : qc.seqQC
 	> Output : qc.seqQC/qc1.seq.summary.merged.out
-	sh SeqQEst.sh -p qc1-summary -d ./qc.seqQC
+	sh SeqQEst.sh -p qc1-merge -d ./qc.seqQC
+	
+	> Input  : 1. qc.seqQC/qc1.seq.summary.merged.out
+	           2. sample.info 
+	> Output : summary_seqQC/report.summary_seqQC.out
+	sh SeqQEst.sh -m qc.seqQC/qc1.seq.summary.merged.out -f sample.info -o summary_seqQC
 	
 	
 	* GermlineQC
@@ -261,8 +265,7 @@ MGI-Server (LSF)
 	
 	> Input  : 1. qc.germlineQC/qc2.snp.merged_vaf.table
 	           2. sample.info 
-	> Output : summary_germlineQC
-	           summary_germlineQC/report.summary_germlineQC.out
+	> Output : summary_germlineQC/report.summary_germlineQC.out
 	sh SeqQEst.sh -p qc2-summary -m qc.germlineQC/qc2.snp.merged_vaf.table -f sample.info -o summary_germlineQC
 	
 	# plot
@@ -276,8 +279,7 @@ MGI-Server (LSF)
 	
 	> Input  : 1. qc.hlaQC/qc3.hla.merged.out
 	           2. sample.info
-	> Output : summary_hlaQC
-	           summary_hlaQC/report.summary_hlaQC.out
+	> Output : summary_hlaQC/report.summary_hlaQC.out
 	sh SeqQEst.sh -p qc3-summary -f sample.info -m qc.hlaQC/qc3.hla.merged.out -o summary_hlaQC
 
 
@@ -289,4 +291,5 @@ MGI-Server (LSF)
 Contact
 -------------
 Hua Sun, <hua.sun@wustl.edu>
+
 
