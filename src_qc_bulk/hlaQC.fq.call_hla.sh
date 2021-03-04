@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Hua Sun
-# 2021-03-01;2020-10-06
+# 2021-03-01;
 # bash run.sh -T dna -N sampleName -O ./OUT -B sample.bam
 
 # -C config.ini
@@ -18,7 +18,7 @@ CONFIG=""
 TYPE="dna"
 pipeline="bwa"
 
-while getopts "C:P:N:T:B:O:" opt; do
+while getopts "C:P:N:T:1:2:O:" opt; do
   case $opt in
     C)
       CONFIG=$OPTARG
@@ -32,9 +32,12 @@ while getopts "C:P:N:T:B:O:" opt; do
     T)
       TYPE=$OPTARG
       ;;
-    B)
-      BAM=$OPTARG
-      ;; 
+    1)
+      FQ1=$OPTARG
+      ;;
+    2)
+      FQ2=$OPTARG
+      ;;    
     O)
       OUTDIR=$OPTARG
       ;;           
@@ -71,6 +74,7 @@ if [[ $TYPE == "rna" ]] || [[ $TYPE == "RNA" ]] || [[ $TYPE == "RNA-Seq" ]];then
 
 # set run OptiType function
 run_optiType () {
+    
     if [[ $TYPE == "dna" ]] || [[ $TYPE == "DNA" ]] || [[ $TYPE == "WES" ]] || [[ $TYPE == "WGS" ]]; then
         $OptiTypePipeline -i $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq --dna -o $OUT --config ${config_for_optiType}
     fi
@@ -84,13 +88,13 @@ run_optiType () {
 
 
 
-
 ##===========================##
 ##       Main
 ##===========================##
 
+
 ##------------- OptiTypePipeline (only using it re-run optitype)
-if [[ $pipeline == "optiType" ]]; then  
+if [[ $pipeline == "optiType" ]]; then 
     n=`ls $OUT/*/*.tsv | wc -l`
     
     if [[ $n > 0 ]];then
@@ -101,23 +105,6 @@ if [[ $pipeline == "optiType" ]]; then
     run_optiType
     exit 0
 fi
-
-
-
-
-
-##------------- bam to fastq
-$SAMTOOLS sort -m 2G -@ 6 -o $OUT/${NAME}.sortbyName.bam -n $BAM
-$SAMTOOLS fastq -1 $OUT/${NAME}.r1.fastq.gz -2 $OUT/${NAME}.r2.fastq.gz -0 /dev/null -s /dev/null -n -F 0x900 $OUT/${NAME}.sortbyName.bam
-
-FQ1=$OUT/${NAME}.r1.fastq.gz
-FQ2=$OUT/${NAME}.r2.fastq.gz
-
-
-rm -f $OUT/${NAME}.sortbyName.bam
-
-
-
 
 
 
@@ -137,37 +124,9 @@ if [[ $pipeline == "bwa" ]]; then
 
     ## remove temp file 
     rm -f $OUT/$NAME.fished_2.bam
-    rm -f $FQ1 $FQ2
-
 
     # run OptiType
     run_optiType
-    exit 0
-fi
-
-
-
-
-##------------- razers3
-if [[ $pipeline == "razers3" ]]; then
-    # R1
-    gzip -cd $FQ1 > $OUT/$NAME.r1.fastq
-    $RAZERS3 -i 95 -m 1 -dr 0 -o $OUT/$NAME.fished_1.bam $HLA_FASTA $OUT/$NAME.r1.fastq
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_1.bam > $OUT/$NAME.fished_1.fastq
-
-    rm -f $OUT/$NAME.r1.fastq $OUT/$NAME.fished_1.bam
-
-
-    # R2
-    gzip -cd $FQ2 > $OUT/$NAME.r2.fastq
-    $RAZERS3 -i 95 -m 1 -dr 0 -o $OUT/$NAME.fished_2.bam $HLA_FASTA $OUT/$NAME.r2.fastq
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_2.bam > $OUT/$NAME.fished_2.fastq
-
-    rm -f $OUT/$NAME.r2.fastq $OUT/$NAME.fished_2.bam
-    rm -f $FQ1 $FQ2
-
-    # run OptiType
-    run_optiType 
 fi
 
 
