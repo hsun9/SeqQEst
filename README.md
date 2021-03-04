@@ -4,10 +4,10 @@ SeqQEst
 Quality control for next-generation sequencing data
 
 Author: Hua Sun  
-Version: v1.01
+Version: v1.02
 
-* Updated (2021-02-15)
-	* v1.01 -- Updated SeqQC summary
+* Updated (2021-03-01)
+	* v1.02 -- Updated SeqQC summary
 
 * Previous version
 	* Version v1.0: https://github.com/ding-lab/SeqQEst/tree/v1.0
@@ -83,7 +83,10 @@ Input
 	* WGS
 	* WES
 	* RNA-Seq
-	
+
+* FASTQ
+	* HLA-QC is able to use input as BAM or fastq.gz 
+
 * Table of bam/sample info
 	* bam.catalog (Form)
 		> The table uses for running cohort
@@ -210,8 +213,12 @@ sh SeqQEst.sh -p qc2-plot -m matrix.tsv -o summary_germlineQC
 #### HLA-QC (qc3)
 
 ```
-# qc3 call hla (-t dna/rna)
+# qc3 call hla (-t dna/rna) - bam
 sh SeqQEst.sh -p qc3-hla -n samplename -t dna -b sample.bam -o qc.hlaQC
+
+# qc3 call hla (-t dna/rna) - fastq
+sh SeqQEst.sh -p qc3-hla -n samplename -t dna -1 r1.fastq.gz -2 r2.fastq.gz -o qc.hlaQC
+
 
 # qc3 merge
 sh SeqQEst.sh -p qc3-merge -d qc.hlaQC -o qc.hlaQC
@@ -244,6 +251,8 @@ MGI-Server (LSF)
 	> Input  : bam.catalog.table
 	> Output : qc.hlaQC
 	sh worklogs/run.hlaQC.callHLA.fromTable.sh -T ./demo.bam.catalog.table
+
+
 
 
 2. Summary Report (Table)
@@ -285,8 +294,6 @@ MGI-Server (LSF)
 
 
 ```
-
-
 
 
 Contact
