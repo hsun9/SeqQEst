@@ -3,8 +3,9 @@
 # Author: Hua Sun
 # Email: hua.sun@wustl.edu or hua.sun229@gmail.com
 
-# 2021-02-15   v1.01  update SeqQC summary report
-# 2020-11-10   v1.0  renamed all of scripts; add HLA-QC local version to SeqQEst 
+# 2021-03-01   v1.02  Update HLAQC - Add call HLA-genotype from fastq 
+# 2021-02-15   v1.01  Update SeqQC - Summary report
+# 2020-11-10   v1.0  Renamed all of scripts; add HLA-QC local version to SeqQEst 
 # 2020-07-29   beta v0.3
 
 
@@ -24,7 +25,7 @@ config="/gscuser/hua.sun/scripts/SeqQEst/config/config.gencode.ini"
 
 type='dna' # dna/rna
 
-while getopts "c:l:p:n:m:f:g:t:b:d:o:" opt; do
+while getopts "c:l:p:n:m:f:g:t:b:1:2:d:o:" opt; do
   case $opt in
     c)
       config=$OPTARG
@@ -184,10 +185,14 @@ fi
 ###############################
 
 ##------------ Call HLA genotype (QC-L3: step-1)
+# for BAM
 if [[ $pipeline == "qc3-hla" ]]; then
-  
     sh $scriptDir/hlaQC.bam.call_hla.sh -C ${config} -N ${name} -T ${type} -B ${bam} -O ${outdir}
-  
+fi
+
+# for FASTQ
+if [[ $pipeline == "qc3-hla-fq" ]]; then
+    sh $scriptDir/hlaQC.fq.call_hla.sh -C ${config} -N ${name} -T ${type} -1 ${fq1} -2 ${fq2} -O ${outdir}
 fi
 
 
@@ -199,18 +204,14 @@ fi
 
 ##------------ Merge HLA results (QC-L3: step-2)
 if [[ $pipeline == "qc3-merge" ]]; then
-
     ls ${outdir}/*/*/*_result.tsv | while read file; do sample=`echo $file | perl -ne '@arr=split("\/");print $arr[-3]'`; sed '1d' $file | cut -f 2- | perl -pe 's/^/'$sample'\t/'; done | sort -u | perl -pe 's/^/Sample\tA1\tA2\tB1\tB2\tC1\tC2\tReads\tObjective\n/ if $.==1' > ${outdir}/qc3.hla.merged.out
-
 fi
 
 
 ##------------ Summary QC-L3 (QC-L3: step-3)
 if [[ $pipeline == "qc3-summary" ]]; then
-
     echo "[INFO] HLA-QC summary report ..." >&2
     ${PYTHON3} $scriptDir/hlaQC.summary.report.py -i ${sampleInfo} --hla ${matrix} -o ${outdir}
-
 fi
 
 
