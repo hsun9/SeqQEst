@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Hua Sun
-# 2020-10-06
+# 2021-03-01;2020-10-06
 # bash run.sh -T dna -N sampleName -O ./OUT -B sample.bam
 
 # -C config.ini
@@ -71,7 +71,6 @@ if [[ $TYPE == "rna" ]] || [[ $TYPE == "RNA" ]] || [[ $TYPE == "RNA-Seq" ]];then
 
 # set run OptiType function
 run_optiType () {
-    
     if [[ $TYPE == "dna" ]] || [[ $TYPE == "DNA" ]] || [[ $TYPE == "WES" ]] || [[ $TYPE == "WGS" ]]; then
         $OptiTypePipeline -i $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq --dna -o $OUT --config ${config_for_optiType}
     fi
@@ -79,7 +78,10 @@ run_optiType () {
     if [[ $TYPE == "rna" ]] || [[ $TYPE == "RNA" ]] || [[ $TYPE == "RNA-Seq" ]]; then
         $OptiTypePipeline -i $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq --rna -o $OUT --config ${config_for_optiType}
     fi
+    
+    exit 0
 }
+
 
 
 
@@ -87,11 +89,8 @@ run_optiType () {
 ##       Main
 ##===========================##
 
-
-
 ##------------- OptiTypePipeline (only using it re-run optitype)
-if [[ $pipeline == "optiType" ]]; then
-    
+if [[ $pipeline == "optiType" ]]; then  
     n=`ls $OUT/*/*.tsv | wc -l`
     
     if [[ $n > 0 ]];then
@@ -143,7 +142,7 @@ if [[ $pipeline == "bwa" ]]; then
 
     # run OptiType
     run_optiType
-  
+    exit 0
 fi
 
 
@@ -151,9 +150,8 @@ fi
 
 ##------------- razers3
 if [[ $pipeline == "razers3" ]]; then
-
     # R1
-    gzip -cd $FQ2 > $OUT/$NAME.r1.fastq
+    gzip -cd $FQ1 > $OUT/$NAME.r1.fastq
     $RAZERS3 -i 95 -m 1 -dr 0 -o $OUT/$NAME.fished_1.bam $HLA_FASTA $OUT/$NAME.r1.fastq
     $SAMTOOLS bam2fq $OUT/$NAME.fished_1.bam > $OUT/$NAME.fished_1.fastq
 
@@ -169,8 +167,7 @@ if [[ $pipeline == "razers3" ]]; then
     rm -f $FQ1 $FQ2
 
     # run OptiType
-    run_optiType
-  
+    run_optiType 
 fi
 
 
