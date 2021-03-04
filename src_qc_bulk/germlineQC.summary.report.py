@@ -114,7 +114,7 @@ def CheckSampleMatching_forCase(info, data, dict_info, outdir):
     
     caseList = list(info['CaseID'].unique())
     
-    summary_rec = pd.DataFrame(columns=['ID', 'TotalData_in_Case', 'Matched_DNA', 'Matched_RNA', 'Total_Matched_N', 'MatchedRate_in_Case', 'QC', 'LowCor_with'])
+    summary_rec = pd.DataFrame(columns=['ID', 'TotalData_in_Case', 'Matched_DNA', 'Matched_RNA', 'Total_Matched_Num', 'MatchedRate_in_Case', 'QC', 'LowCor_with'])
 
     for caseID in caseList:
         sampleList = list(info.loc[info['CaseID']==caseID, 'ID'])
@@ -183,7 +183,7 @@ def MakeSummaryReport_forCaseLevel(df, dict_info, sampleList, summary_rec):
         if totalSampleSize == 1:
             qc = 'SINGLE'
         
-        rec = {'ID':targetID, 'TotalData_in_Case':totalSampleSize, 'Matched_DNA':dna_n, 'Matched_RNA':rna_n, 'Total_Matched_N':int(total_matched), 'MatchedRate_in_Case':matched_rate, 'QC':qc, 'LowCor_with':low_cor_id}
+        rec = {'ID':targetID, 'TotalData_in_Case':totalSampleSize, 'Matched_DNA':dna_n, 'Matched_RNA':rna_n, 'Total_Matched_Num':int(total_matched), 'MatchedRate_in_Case':matched_rate, 'QC':qc, 'LowCor_with':low_cor_id}
         summary_rec = summary_rec.append(rec, ignore_index=True)
 
 
