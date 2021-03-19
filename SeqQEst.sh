@@ -54,6 +54,12 @@ while getopts "c:l:p:n:m:f:g:t:b:1:2:d:o:" opt; do
     b)
       bam=$OPTARG
       ;;
+    1)
+      fq1=$OPTARG
+      ;;
+    2)
+      fq2=$OPTARG
+      ;;  
     d)
       dir=$OPTARG
       ;;
