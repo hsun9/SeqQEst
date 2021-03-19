@@ -2,7 +2,8 @@
 
     Author: Hua Sun
     Email: hua.sun@wustl.edu/hua.sun229@gmail.com
-  
+    
+    v0.1.2 2021-03-19
     v0.1.1 2020-11-22
     v0.1   2020-11-09
   
@@ -15,7 +16,7 @@
     -i|--info <file>  sample info file
     --hla <file>      merged hla file
     -o [str]          outdir
-
+  
 """
 
 import argparse
@@ -52,6 +53,9 @@ def main():
     df_info = pd.read_csv(args.info, sep='\t', usecols=range(0,2))
     df_info.columns=['CaseID', 'ID']
 
+    # check id of sample_info and hla sample
+    Check_SampleCount(df_info, df_hla)
+
     # merge hla with info
     df_info_with_hla = pd.merge(df_info, df_hla.iloc[:,:7], left_on='ID', right_on='Sample', how='outer')
     df_info_with_hla.drop(columns='Sample', inplace=True)
@@ -80,6 +84,19 @@ def Check_Dir(dir):
     if not os.path.isdir(dir):
         message = '[Error] Directory not exists ...' + str(dir)
         sys.exit(message)
+
+
+def Check_SampleCount(df_info, df_hla):
+    sample_from_info = df_info['ID'].values.tolist()
+    sample_from_hla = df_hla['Sample'].values.tolist()
+    print(f'[INFO] Sample size: info-{len(sample_from_info)}   hla-{len(sample_from_hla)}')
+
+    intersect = list(set(sample_from_info) & set(sample_from_hla))
+    unique_info = list(set(sample_from_info) ^ set(intersect))
+    unique_hla = list(set(intersect) ^ set(sample_from_hla))
+    print(f'[INFO] Shared shample: {len(intersect)}')
+    print(f'[INFO] Unmatched sample in info: {len(unique_info)}')
+    print(f'[INFO] Unmatched sample in hla: {len(unique_hla)}')
 
 
 
@@ -152,7 +169,7 @@ def MakeDictionary(df):
     for i in df.index:
         key = str(df.iloc[i,0])
         val = str(df.iloc[i,1])
-        
+
         if key in hla_dict:
             hla_dict[key].append(val)
         else:

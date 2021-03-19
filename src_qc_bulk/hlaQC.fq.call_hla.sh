@@ -59,6 +59,18 @@ mkdir -p $OUT
 source ${CONFIG}
 
 
+if [ ! -e $FQ1 ]; then
+    echo "[ERROR] The FastQ_1 of $NAME does not exist - $FQ1 ..." >&2
+    exit 1
+fi
+
+if [ ! -e $FQ2 ]; then
+    echo "[ERROR] The FastQ_2 of $NAME does not exist - $FQ2 ..." >&2
+    exit 1
+fi
+
+
+
 
 HLA_FASTA=''
 
@@ -73,7 +85,7 @@ if [[ $TYPE == "rna" ]] || [[ $TYPE == "RNA" ]] || [[ $TYPE == "RNA-Seq" ]];then
 ##===========================##
 
 # set run OptiType function
-run_optiType () {
+function run_optiType {
     
     if [[ $TYPE == "dna" ]] || [[ $TYPE == "DNA" ]] || [[ $TYPE == "WES" ]] || [[ $TYPE == "WGS" ]]; then
         $OptiTypePipeline -i $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq --dna -o $OUT --config ${config_for_optiType}
@@ -94,14 +106,14 @@ run_optiType () {
 
 
 ##------------- OptiTypePipeline (only using it re-run optitype)
-if [[ $pipeline == "optiType" ]]; then 
+if [[ $pipeline == "optiType" ]]; then
     n=`ls $OUT/*/*.tsv | wc -l`
     
     if [[ $n > 0 ]];then
         echo "[INFO] The $OUT/$NAME already exist HLA genotype ..." >&2
         exit 0
     fi
-    
+      
     run_optiType
     exit 0
 fi
@@ -112,19 +124,21 @@ fi
 if [[ $pipeline == "bwa" ]]; then
     # R1
     $BWA mem -t 8 $HLA_FASTA $FQ1 | $SAMTOOLS view -Shb -F 4 -o $OUT/$NAME.fished_1.bam -
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_1.bam > $OUT/$NAME.fished_1.fastq
+    $SAMTOOLS rmdup -s $OUT/$NAME.fished_1.bam $OUT/$NAME.fished_1.rmdup.bam
+    $SAMTOOLS bam2fq $OUT/$NAME.fished_1.rmdup.bam > $OUT/$NAME.fished_1.fastq
 
     ## remove temp file 
-    rm -f $OUT/$NAME.fished_1.bam
+    rm -f $OUT/$NAME.fished_1.bam $OUT/$NAME.fished_1.rmdup.bam
 
 
     # R2
     $BWA mem -t 8 $HLA_FASTA $FQ2 | $SAMTOOLS view -Shb -F 4 -o $OUT/$NAME.fished_2.bam -
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_2.bam > $OUT/$NAME.fished_2.fastq
+    $SAMTOOLS rmdup -s $OUT/$NAME.fished_2.bam $OUT/$NAME.fished_2.rmdup.bam
+    $SAMTOOLS bam2fq $OUT/$NAME.fished_2.rmdup.bam > $OUT/$NAME.fished_2.fastq
 
     ## remove temp file 
-    rm -f $OUT/$NAME.fished_2.bam
-
+    rm -f $OUT/$NAME.fished_2.bam $OUT/$NAME.fished_2.rmdup.bam    
+    
     # run OptiType
     run_optiType
 fi

@@ -70,7 +70,7 @@ if [[ $TYPE == "rna" ]] || [[ $TYPE == "RNA" ]] || [[ $TYPE == "RNA-Seq" ]];then
 ##===========================##
 
 # set run OptiType function
-run_optiType () {
+function run_optiType {
     if [[ $TYPE == "dna" ]] || [[ $TYPE == "DNA" ]] || [[ $TYPE == "WES" ]] || [[ $TYPE == "WGS" ]]; then
         $OptiTypePipeline -i $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq --dna -o $OUT --config ${config_for_optiType}
     fi
@@ -144,32 +144,6 @@ if [[ $pipeline == "bwa" ]]; then
     run_optiType
     exit 0
 fi
-
-
-
-
-##------------- razers3
-if [[ $pipeline == "razers3" ]]; then
-    # R1
-    gzip -cd $FQ1 > $OUT/$NAME.r1.fastq
-    $RAZERS3 -i 95 -m 1 -dr 0 -o $OUT/$NAME.fished_1.bam $HLA_FASTA $OUT/$NAME.r1.fastq
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_1.bam > $OUT/$NAME.fished_1.fastq
-
-    rm -f $OUT/$NAME.r1.fastq $OUT/$NAME.fished_1.bam
-
-
-    # R2
-    gzip -cd $FQ2 > $OUT/$NAME.r2.fastq
-    $RAZERS3 -i 95 -m 1 -dr 0 -o $OUT/$NAME.fished_2.bam $HLA_FASTA $OUT/$NAME.r2.fastq
-    $SAMTOOLS bam2fq $OUT/$NAME.fished_2.bam > $OUT/$NAME.fished_2.fastq
-
-    rm -f $OUT/$NAME.r2.fastq $OUT/$NAME.fished_2.bam
-    rm -f $FQ1 $FQ2
-
-    # run OptiType
-    run_optiType 
-fi
-
 
 
 #rm -f $OUT/$NAME.fished_1.fastq $OUT/$NAME.fished_2.fastq
