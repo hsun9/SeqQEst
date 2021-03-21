@@ -1,21 +1,11 @@
 '''
     Hua Sun
 
-    2021-02-15; 2019-11-04
+    2021-03-21; 2021-02-15; 2019-11-04
 
     Plot for qc.SeqQC summary data
 
-    // qc.seqQC/qc1.seq.summary.merged.out
-
-    // info
-    CaseID	ID	NewID	DataType	Group
-    WU-0012	TWDE-HPB_242-242-03	WU-0012.WES.N	WES	Human_Normal
-    WU-0059	TWDE-WUR-014-DRESL5C_4639	WU-0059.WES.P2	WES	PDX
-
-    DataType: WGS/WES/RNA-Seq
-
     python3 seqQC.summary.report.py -d qc.seqQC.tsv --info sample.info -o outdir 
-
 
 '''
 
@@ -71,7 +61,7 @@ def main():
             df_tar = df_merge.loc[df_merge['DataType']=='WES', ['ID', 'MeanTargetCoverage(MQ20)']]
                     
         if dataType == 'RNA-Seq':
-            df_tar = df_merge.loc[df_merge['DataType']=='WGS', ['ID', 'MappedReads(M)']]
+            df_tar = df_merge.loc[df_merge['DataType']=='RNA-Seq', ['ID', 'MappedReads(M)']]
         
         if df_tar.shape[0] > 0:
             PlotDepth(df_tar, dataType, args.outdir)
@@ -158,8 +148,11 @@ def JudgePerSample(sample, row):
 
 ## Plot
 def PlotDepth(df, dataType, outdir):
-    
+    print(df.shape)
     df = df.sort_values(by=df.columns.values[1], ascending=False)
+    mean_val = int(df.iloc[:,1].mean())
+    x_max = df.shape[0]
+    y_max = df.iloc[:,1].max()
 
     title = ''
     ylabel = ''
@@ -178,7 +171,7 @@ def PlotDepth(df, dataType, outdir):
 
     sampleSize = df.shape[0]
 
-    plt.plot(df.iloc[:,0], df.iloc[:,1], 'o', markersize=4)
+    plt.plot(df.iloc[:,0], df.iloc[:,1], 'o', markersize=2)
     
     plt.title(title)
     plt.xlabel(f'Sample size n={sampleSize}')
@@ -189,10 +182,15 @@ def PlotDepth(df, dataType, outdir):
     
     plt.axhline(y=50, color='g', linestyle='-')
     plt.axhline(y=20, color='r', linestyle='-')
+
+    plt.text(x_max*0.8, y_max*0.8, f'Mean={mean_val}')
+
     
     outfile = f'{outdir}/qc.seqQC.{dataType}.pdf'
 
     plt.savefig(outfile)
+
+    plt.close()
 
 
 
