@@ -6,6 +6,7 @@ Quality control for next-generation sequencing data
 Author: Hua Sun  
 Version: v1.02
 
+* Updated (2021-03-20)
 * Updated (2021-03-01)
 	* v1.02 -- Add `hlaQC.fq.call_hla.sh`
 
