@@ -62,7 +62,6 @@ The "setup_tools.sh" will install tools and output `config_seqQEst.ini`, which w
 
 * SNP loci (qc2)
 	* See folder loci/
-	* Note: To obtain the loci information, please contact with author. 
 
 * HLA database (qc3)
 	* See folder data/
