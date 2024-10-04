@@ -298,6 +298,6 @@ MGI-Server (LSF)
 
 Contact
 -------------
-Hua Sun, <hua.sun229@gmail.com>
+Hua Sun, <hua.sun229@gmail.com>; Li Ding (PI) <lding@wustl.edu>
 
 
