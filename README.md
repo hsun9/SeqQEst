@@ -295,6 +295,9 @@ MGI-Server (LSF)
 
 ```
 
+The first manuscript using this tool
+-------------
+Hua Sun, et al., Nat Commun 2021. Comprehensive characterization of 536 patient-derived xenograft models prioritizes candidates for targeted treatment.
 
 Contact
 -------------
